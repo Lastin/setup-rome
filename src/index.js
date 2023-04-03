@@ -49,6 +49,7 @@ async function install() {
 	const romeBinary = path.join(romeDirectory, `rome${getBinaryExtension()}`);
 
 	const tagName = await resolveReleaseTagName();
+	core.debug(`Using tag ${tagName}`);
 	const url = await getDownloadUrl(tagName);
 
 	try {
@@ -108,7 +109,7 @@ async function resolveVersion(version) {
 
 	const { repository } = await octokit.graphql(
 		`
-        { 
+        {
             repository(owner: "rome", name: "tools") {
                 releases(orderBy: { field:CREATED_AT, direction:DESC }, first: 100) {
                     nodes {
@@ -129,6 +130,8 @@ async function resolveVersion(version) {
 	if (releases == null) {
 		throw new Error("Failed to retrieve the list of releases");
 	}
+
+	core.debug(`Found ${releases.length} releases`);
 
 	// fetch latest version
 	if (version === "latest") {
